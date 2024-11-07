@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Switch Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .switch-container {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .switch {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+            cursor: pointer;
+            user-select: none;
+        }
+        .closed {
+            background-color: green;
+        }
+        .open {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Switch Simulation</h1>
+    <label for="numSwitches">Enter the number of switches: </label>
+    <input type="number" id="numSwitches" min="1">
+    <button onclick="initializeSwitches()">Initialize</button>
+
+    <div class="switch-container" id="switchContainer"></div>
+
+    <p id="pressesCount"></p>
+    <p id="iterationStates"></p>
+    <p id="finalState"></p>
+
+    <script>
+        let switches = [];
+        let presses = 0;
+
+        function initializeSwitches() {
+            const numSwitches = parseInt(document.getElementById('numSwitches').value);
+            const switchContainer = document.getElementById('switchContainer');
+            switchContainer.innerHTML = '';
+            switches = [];
+            presses = 0;
+            document.getElementById('pressesCount').innerText = '';
+            document.getElementById('iterationStates').innerText = '';
+            document.getElementById('finalState').innerText = '';
+
+            for (let i = 0; i < numSwitches; i++) {
+                const state = Math.random() < 0.5 ? 0 : 1;
+                switches.push(state);
+                const switchElement = document.createElement('div');
+                switchElement.className = 'switch ' + (state ? 'closed' : 'open');
+                switchElement.innerText = state;
+                switchContainer.appendChild(switchElement);
+            }
+        }
+
+        function toggleSwitch(index) {
+            switches[index] = 1 - switches[index];
+            const switchContainer = document.getElementById('switchContainer');
+            const switchElement = switchContainer.children[index];
+            switchElement.className = 'switch ' + (switches[index] ? 'closed' : 'open');
+            switchElement.innerText = switches[index];
+        }
+
+        function allClosed() {
+            return switches.every(state => state === 1);
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function simulate() {
+            for (let i = 0; i < switches.length; i++) {
+                if (switches[i] === 0) {
+                    presses++;
+                    toggleSwitch(i);
+                    document.getElementById('pressesCount').innerText = Presses: ${presses};
+                    document.getElementById('iterationStates').innerText += After pressing button ${presses}, state of switches: ${switches.join(' ')}\n;
+                    await delay(1000);  // Delay for 1000 milliseconds
+                }
+                if (allClosed()) {
+                    break;
+                }
+            }
+            document.getElementById('pressesCount').innerText = Minimum button presses needed: ${presses};
+            document.getElementById('finalState').innerText = Final state of switches: ${switches.join(' ')};
+        }
+
+        document.getElementById('numSwitches').addEventListener('input', () => {
+            document.querySelector('button[onclick="simulate()"]')?.remove();
+            const simulateButton = document.createElement('button');
+            simulateButton.innerText = 'Simulate';
+            simulateButton.onclick = simulate;
+            document.body.appendChild(simulateButton);
+        });
+    </script>
+</body>
+</html>
