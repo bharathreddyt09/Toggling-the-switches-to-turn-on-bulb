@@ -1,113 +1,82 @@
-#include<stdio.h>
-#include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#define MAXSIZE 50
+#include <time.h>
 
-typedef struct {
-    char name[50];
-    float price;
-    int quantity;
-} Product;
-
-
-void addProduct(Product inventory[], int *num) {
-    if (*num>= MAXSIZE) {
-        printf("Inventory is full!\n");
-        return;
-    }
-
-    printf("\nEnter product details:\n");
-    printf("Name: ");
-    getchar();
-    scanf(" %s", inventory[*num].name);
-    printf("Price: $");
-    scanf("%f", &inventory[*num].price);
-    printf("Quantity: ");
-    scanf("%d", &inventory[*num].quantity);
-
-    (*num)++;
-    printf("Product added successfully!\n");
+// Function to toggle the switch at index i using Grey code technique
+void toggle_grey(int *switches, int i) {
+    switches[i] = 1 - switches[i];
 }
 
-
-void displayInventory(Product inventory[], int num) {
-    if (num== 0) {
-        printf("Inventory is empty.\n");
-        return;
+// Function to check if all switches are closed
+bool all_closed(int *switches, int n) {
+    for (int i = 0; i < n; i++) {
+        if (switches[i] == 0) {
+            return false;
+        }
     }
-
-    printf("\nInventory:\n");
-    for (int i = 0; i < num; i++) {
-        printf("Product: %s | Price: $%.2f | Quantity: %d\n", inventory[i].name, inventory[i].price, inventory[i].quantity);
-    }
+    return true;
 }
 
-
-float calculateTotalValue(Product inventory[], int num) {
-    float total = 0;
-    for (int i = 0; i < num; i++) {
-        total += (inventory[i].price * inventory[i].quantity);
+// Function to print the state of all switches
+void print_switches(int *switches, int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", switches[i]);
     }
-    return total;
+    printf("\n");
 }
 
+int main() {
+    int n;  // Number of switches
+    
+    // Take the number of switches from the user
+    printf("Enter the number of switches: ");
+    scanf("%d", &n);
 
-void searchItem(Product inventory[], int num, char name[]) {
-    int found = 0;
-    printf("\nSearch Results:\n");
-    for (int i = 0; i < num; ++i) {
-        if (strcmp(inventory[i].name, name) == 0) {
-            printf("Name: %s\n", inventory[i].name);
-            printf("Quantity: %d\n", inventory[i].quantity);
-            printf("Price: %.2f\n", inventory[i].price);
-            found = 1;
+    int switches[n];
+    
+    // Initialize random seed
+    srand(time(NULL));
+    
+    // Initialize all switches to a random state
+    for (int i = 0; i < n; i++) {
+        switches[i] = rand() % 2;  // Randomly assign 0 (open) or 1 (closed)
+    }
+
+    int presses = 0;  // Initialize the number of button presses
+
+    // Print initial state of switches
+    printf("Initial state of switches: ");
+    print_switches(switches, n);
+
+    // Iterate over each switch and toggle it using Grey code technique
+    for (int i = 0; i < n; i++) {
+        if (switches[i] == 0) {  // Only toggle if the switch is open (0)
+            presses++;
+            toggle_grey(switches, i);
+            
+            // Print the state of switches after each toggle
+            printf("After pressing button %d, state of switches: ", presses);
+            print_switches(switches, n);
+        }
+
+        // Check if all switches are closed
+        if (all_closed(switches, n)) {
             break;
         }
     }
-    if (found==0) {
-        printf("Item not found in inventory.\n");
+
+    // Output the results
+    printf("Minimum button presses needed: %d\n", presses);
+    printf("Final state of switches: ");
+    print_switches(switches, n);
+
+    // Check if all switches are closed and print the bulb status
+    if (all_closed(switches, n)) {
+        printf("The bulb is ON.\n");
+    } else {
+        printf("The bulb is OFF.\n");
     }
-}
 
-
-
-int main() {
-    Product inventory[MAXSIZE];
-    int num = 0;
-    int choice;
-    char name[50];
-
-    while(1){
-        printf("\nInventory Management System\n");
-        printf("1. Add Product\n");
-        printf("2. Display Inventory\n");
-        printf("3. Calculate Total Inventory Value\n");
-        printf("4. search product\n");
-        printf("5. exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                addProduct(inventory, &num);
-                break;
-            case 2:
-                displayInventory(inventory, num);
-                break;
-            case 3:
-                printf("Total inventory value: $%0.2f\n", calculateTotalValue(inventory, num));
-                break;
-            case 4:
-                printf("Enter the name of the item to search: ");
-                getchar();
-                scanf(" %s", name);
-                searchItem(inventory, num, name);
-                break;
-            case 5:
-                exit(0);
-            default:
-                printf("Invalid choice! Please try again.\n");
-        }
-    }
     return 0;
 }
